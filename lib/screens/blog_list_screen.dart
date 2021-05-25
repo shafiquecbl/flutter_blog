@@ -47,6 +47,7 @@ class _BlogListScreenState extends State<BlogListScreen> {
       body: SafeArea(
         minimum: const EdgeInsets.all(16),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
                 decoration: InputDecoration(
@@ -67,68 +68,63 @@ class _BlogListScreenState extends State<BlogListScreen> {
             const SizedBox(
               height: 20,
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Available Blogs',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                FutureBuilder(
-                  future: searchTitle == null || searchTitle == ""
-                      ? Provider.of<BlogProvider>(context, listen: false)
-                          .getBlogs()
-                      : Provider.of<BlogProvider>(context, listen: false)
-                          .searchBlogs(searchTitle),
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return Center(child: CircularProgressIndicator());
-                    return Consumer<BlogProvider>(
-                      child: Center(
-                        child: Text('No Blog Available'),
-                      ),
-                      builder: (context, blogprovider, child) =>
-                          blogprovider.items.length <= 0
-                              ? child
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: BouncingScrollPhysics(),
-                                  itemCount: blogprovider.items.length + 1,
-                                  itemBuilder: (context, index) {
-                                    if (index == 0) {
-                                      return Container();
-                                    } else {
-                                      final i = index - 1;
-                                      final item = blogprovider.items[i];
-
-                                      return PostCellWidget(
-                                          model: BlogModel(
-                                        item.id,
-                                        item.title,
-                                        item.content,
-                                        item.date,
-                                        item.imagePath,
-                                      ));
-                                    }
-                                  },
-                                ),
-                    );
-                  },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-              ],
+            Text(
+              'Available Blogs',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+              textAlign: TextAlign.left,
             ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+                child: SizedBox(
+              height: 100,
+              child: FutureBuilder(
+                future: searchTitle == null || searchTitle == ""
+                    ? Provider.of<BlogProvider>(context, listen: false)
+                        .getBlogs()
+                    : Provider.of<BlogProvider>(context, listen: false)
+                        .searchBlogs(searchTitle),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    return Center(child: CircularProgressIndicator());
+                  return Consumer<BlogProvider>(
+                    child: Center(
+                      child: Text('No Blog Available'),
+                    ),
+                    builder: (context, blogprovider, child) =>
+                        blogprovider.items.length <= 0
+                            ? child
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                physics: BouncingScrollPhysics(),
+                                itemCount: blogprovider.items.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index == 0) {
+                                    return Container();
+                                  } else {
+                                    final i = index - 1;
+                                    final item = blogprovider.items[i];
+
+                                    return PostCellWidget(
+                                        model: BlogModel(
+                                      item.id,
+                                      item.title,
+                                      item.content,
+                                      item.date,
+                                      item.imagePath,
+                                    ));
+                                  }
+                                },
+                              ),
+                  );
+                },
+              ),
+            ))
           ],
         ),
       ),
