@@ -12,6 +12,7 @@ class BlogListScreen extends StatefulWidget {
 
 class _BlogListScreenState extends State<BlogListScreen> {
   String searchTitle;
+  List selectedList = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,6 +30,36 @@ class _BlogListScreenState extends State<BlogListScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(5),
+            child: Container(
+              decoration:
+                  BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              child: IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.grey[100],
+                ),
+                onPressed: () {
+                  if (selectedList.length != 0) {
+                    for (int i = 0; i < selectedList.length; i++) {
+                      Provider.of<BlogProvider>(context, listen: false)
+                          .deleteBlog(selectedList[i])
+                          .then((value) {
+                        setState(() {
+                          selectedList.clear();
+                        });
+                      });
+                    }
+                  } else {
+                    print('Select a blog first!');
+                  }
+                },
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: Padding(
@@ -111,13 +142,22 @@ class _BlogListScreenState extends State<BlogListScreen> {
                                     final item = blogprovider.items[i];
 
                                     return PostCellWidget(
-                                        model: BlogModel(
-                                      item.id,
-                                      item.title,
-                                      item.content,
-                                      item.date,
-                                      item.imagePath,
-                                    ));
+                                      model: BlogModel(
+                                        item.id,
+                                        item.title,
+                                        item.content,
+                                        item.date,
+                                        item.imagePath,
+                                      ),
+                                      isSelected: (bool value) {
+                                        if (value) {
+                                          selectedList.add(item.id);
+                                        } else {
+                                          selectedList.remove(item.id);
+                                        }
+                                        print(selectedList);
+                                      },
+                                    );
                                   }
                                 },
                               ),
